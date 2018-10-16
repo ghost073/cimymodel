@@ -471,3 +471,179 @@ function get_redis_key($key) {
     return $value;
 }
 }
+
+/**
+ * 字符串中 链接地址 加上a 标签
+ * 
+ * @param  string $str [description]
+ * @return [type]      [description]
+ */
+function text2links($str = '')
+{
+    if ($str === '') {
+        return $str;
+    }
+    $preg = '@(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))@';
+    $str1 = preg_replace($preg, '<a href="$1">$1</a>', $str);
+    return $str1;
+}
+
+/**
+ * 生成固定长度的手机验证码
+ * @param int $len 验证码长度
+ */
+if (!function_exists('randPhoneCode')) {
+    function randPhoneCode($len)
+    {
+        $chars    = array(
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+        );
+        $charsLen = count($chars) - 1;
+        shuffle($chars);
+        $output = "";
+        for ($i = 0; $i < $len; $i++) {
+            $output .= $chars[mt_rand(0, $charsLen)];
+        }
+        return $output;
+    }
+}
+
+/**
+ * 格式化数组
+ * 
+ * @param int 
+ */
+if (!function_exists('format_arr_by_key')) {
+    function format_arr_by_key($arr, $id)
+    {
+        $new_arr = [];
+        foreach ($arr as $key => $val) {
+            $new_arr[$val[$id]] = $val;
+        }
+        return $new_arr;
+    }
+}
+if (!function_exists('str_mid_replace')) {
+// 替换字符串中间部分为**
+function str_mid_replace($string) {
+    if (! $string || !isset($string[1])) {
+        return $string;
+    }
+
+    $len = mb_strlen($string, 'utf-8');
+    // 分成3份，每份长度
+    $fen_len = floor($len / 3); 
+    // 第一份值
+    $first = mb_substr($string, 0, $fen_len, 'utf-8');
+    // 第三份
+    $third = mb_substr($string, $len-$fen_len, $fen_len, 'utf-8');
+    // 第二份
+    $second = str_repeat('*', 3);
+
+    $str = $first.$second.$third;
+
+    return $str; 
+}
+}
+if (!function_exists('phone_jm')) {
+// 加密手机号
+function phone_jm($string) {
+    if (! $string || !isset($string[1])) {
+        return $string;
+    }
+
+    $len = mb_strlen($string, 'utf-8');
+    // 第一份值
+    $first = mb_substr($string, 0, 3, 'utf-8');
+    // 第三份
+    $third = mb_substr($string, $len-4, $fen_len, 'utf-8');
+    // 第二份
+    $second = str_repeat('*', 4);
+
+    $str = $first.$second.$third;
+
+    return $str; 
+}
+}
+
+if (!function_exists('define_txt_view')) {
+/**
+ * 定义格式化，用id做key
+ * 
+ */
+function define_txt_view($arr)
+{
+    $new_arr = [];
+    foreach ($arr as $key => $val) {
+        $new_arr[$val['id']] = $val;
+    }
+    return $new_arr;
+}
+}
+
+
+
+if (!function_exists('gen_in_ids')) {
+/**
+ * 生成IN ID数组，如果没有值，填写-9999 以免IN 的时候报错
+ * 
+ */
+function gen_in_ids($arr)
+{
+    if (empty($arr)) {
+        $arr = [-9999];
+    }
+    return $arr;
+}
+}
+
+/**
+ * 生成密码加密串
+ * 
+ * @param  [type] $password 密码
+ * @return [type]           [description]
+ */
+function genPassword($password) {
+    $password = trim($password);
+    if ($password === '') {
+        return false;
+    }
+    // 获得随机加密盐6位，加密盐越长越难破解
+    $salt = random_str(6);
+    // 获得加密盐前3位
+    $f_salt = substr($salt, 0, 3);
+    // 加密盐后3位
+    $b_salt = substr($salt, 3);
+
+    $data = array();
+    // 加密密码
+    $data['password'] = md5($f_salt.$password.$b_salt);
+    $data['mt']       = $salt;
+
+    return $data;
+}
+
+function verifyPassword($password, $mt, $data_enctype_pass)
+{
+    // 判断管理员登录
+    // 加密盐前3位
+    $f_salt = substr($mt, 0, 3);
+    // 加密盐后3位
+    $b_salt = substr($mt, 3);
+    // 获得加密密码
+    $enctype_pass = md5($f_salt.$password.$b_salt);
+
+    if ($data_enctype_pass !== $enctype_pass) {
+        return false;
+    }
+    return true;
+}
